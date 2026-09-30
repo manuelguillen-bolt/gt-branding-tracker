@@ -296,5 +296,7 @@ function aFila(r) {
 
   fs.mkdirSync(path.join(__dirname, 'docs'), { recursive: true });
   fs.writeFileSync(path.join(__dirname, 'docs', 'index.html'), html);
+  // Evita que GitHub Pages pase el HTML por Jekyll, que falla y no aporta nada
+  fs.writeFileSync(path.join(__dirname, 'docs', '.nojekyll'), '');
   console.log(`docs/index.html escrito · ${html.length} bytes · ${RAW.length} filas`);
 })().catch(e => { console.error('ERROR: ' + e.message); process.exit(1); });
