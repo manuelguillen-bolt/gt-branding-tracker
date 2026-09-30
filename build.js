@@ -217,7 +217,7 @@ SELECT h.reg, h.cid,
 FROM oh h
 LEFT JOIN pd p ON p.reg = h.reg AND p.wks = h.wks
 LEFT JOIN ot o ON o.reg = h.reg AND o.wks = h.wks
-ORDER BY h.wke, h.cid, h.reg`;
+ORDER BY h.wks, h.cid, h.reg`;
 }
 
 /* ─────────── Cálculo del bonus ─────────── */
