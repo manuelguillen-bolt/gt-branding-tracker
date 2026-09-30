@@ -19,6 +19,13 @@
   },
   "default_cohort": "A",
 
+  "_comentario_roster": "Empresas de Global Transport que entran en el bonus. Se usa cuando NO existe el secret SHEET_CSV_URL, que es el modo recomendado: evita publicar en la web el sheet de grouping, que contiene 780 empresas de toda España. Si algún día prefieres que lo gobierne el sheet, añade el secret y esta lista se ignora. 47732 no está porque sale del alcance desde agosto 2026.",
+  "roster_companies": [65039, 87971, 93471, 223891],
+
+  "_comentario_exclusiones": "Empresas a excluir aunque el sheet las asigne al Fleet Owner. Solo aplica en modo sheet. Se deja 47732 como red de seguridad; los meses congelados conservan su roster y no se ven afectados en ningún caso.",
+  "excluded_companies": [47732],
+
+
   "_comentario_vehiculos": "Lista explícita de vehículos vinilados. No se deriva de car_branding_periods porque esa tabla conserva períodos aprobados de coches que ya retiraron el vinilo, como los de AUTOS CARAZO. Añade o quita entradas aquí cuando cambie la flota vinilada. car_ids agrupa los distintos IDs de una misma matrícula cuando el registro se borró y se recreó.",
   "vehicles": [
     { "plate": "6415-KRG", "car_ids": [4661360],            "company_id": 47732,  "cohort": "A",  "cohort_src": "confirmada",    "cohort_det": "Inscrito en campañas Cohort A entre sep 2025 y mar 2026" },

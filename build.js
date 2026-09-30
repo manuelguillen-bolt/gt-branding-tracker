@@ -18,9 +18,19 @@ const CFG  = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'ut
 const SNAP = path.join(__dirname, 'snapshots');
 const TZ   = CFG.timezone || 'Europe/Madrid';
 
-const ENV = ['DATABRICKS_HOST','DATABRICKS_TOKEN','DATABRICKS_WAREHOUSE_ID','SHEET_CSV_URL'];
+const ENV = ['DATABRICKS_HOST','DATABRICKS_TOKEN','DATABRICKS_WAREHOUSE_ID'];
 const falta = ENV.filter(k => !process.env[k]);
 if (falta.length) { console.error('Faltan variables de entorno: ' + falta.join(', ')); process.exit(1); }
+
+/* El roster puede venir de dos sitios:
+   - SHEET_CSV_URL, si quieres que lo gobierne el sheet de grouping
+   - config.roster_companies, si prefieres no depender del sheet
+   Si el secret existe manda el sheet; si no, manda el config. */
+const USA_SHEET = !!process.env.SHEET_CSV_URL;
+if (!USA_SHEET && !(CFG.roster_companies || []).length) {
+  console.error('Sin SHEET_CSV_URL y sin config.roster_companies: no hay de dónde sacar el roster.');
+  process.exit(1);
+}
 
 /* ─────────── Fechas en hora de Madrid ─────────── */
 const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit' });
@@ -99,17 +109,53 @@ function csvFilas(txt) {
 async function rosterDelSheet() {
   const r = await fetch(process.env.SHEET_CSV_URL);
   if (!r.ok) throw new Error(`Sheet CSV HTTP ${r.status}`);
-  const filas = csvFilas(await r.text());
-  const fo = norm(CFG.fleet_owner);
-  const ids = [];
-  for (const f of filas) {
-    if (f.length < 3) continue;
-    const id = parseInt(String(f[1]).replace(/[^\d]/g,''), 10);
-    if (!Number.isFinite(id)) continue;
-    if (norm(f[2]) === fo) ids.push(id);
+  const txt = await r.text();
+  const tipo = (r.headers.get('content-type') || '').split(';')[0];
+
+  // Si la URL no es un CSV publicado, Google responde 200 con HTML de login.
+  const pinta = txt.slice(0, 200).replace(/\s+/g, ' ');
+  if (/^\s*</.test(txt) || /text\/html/.test(tipo)) {
+    throw new Error(
+      `SHEET_CSV_URL devolvió HTML en lugar de CSV (content-type ${tipo}).\n` +
+      `  Primeros caracteres: ${pinta}\n` +
+      `  Necesitas la URL de "Publicar en la web" en formato CSV, que acaba en /pub?gid=...&single=true&output=csv\n` +
+      `  No sirve la URL de /edit ni la de compartir.`);
   }
-  const unicos = [...new Set(ids)].sort((a,b)=>a-b);
-  if (!unicos.length) throw new Error(`El sheet no devolvió ninguna empresa con Fleet Owner = ${CFG.fleet_owner}`);
+
+  const filas = csvFilas(txt);
+  console.log(`  sheet leído · ${tipo} · ${filas.length} filas · ${filas[0] ? filas[0].length : 0} columnas`);
+  if (filas[0]) console.log(`  encabezados: ${filas[0].join(' | ')}`);
+
+  // Localiza la columna del Fleet Owner por su encabezado, con la C como respaldo
+  let colFO = 2, colID = 1;
+  if (filas[0]) {
+    const h = filas[0].map(norm);
+    const iFO = h.findIndex(x => x.includes('FLEETOWNER'));
+    const iID = h.findIndex(x => x.includes('COMPANYID'));
+    if (iFO >= 0) colFO = iFO;
+    if (iID >= 0) colID = iID;
+  }
+
+  const fo = norm(CFG.fleet_owner);
+  const ids = [], vistos = new Map();
+  for (const f of filas) {
+    if (f.length <= Math.max(colFO, colID)) continue;
+    const etiqueta = norm(f[colFO]);
+    if (etiqueta) vistos.set(etiqueta, (vistos.get(etiqueta) || 0) + 1);
+    const id = parseInt(String(f[colID]).replace(/[^\d]/g, ''), 10);
+    if (!Number.isFinite(id)) continue;
+    if (etiqueta === fo) ids.push(id);          // norm() ignora mayúsculas y espacios
+  }
+
+  const unicos = [...new Set(ids)].sort((a, b) => a - b);
+  if (!unicos.length) {
+    const top = [...vistos.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15)
+      .map(([k,n]) => `${k} (${n})`).join(', ');
+    throw new Error(
+      `Ninguna fila con Fleet Owner = ${CFG.fleet_owner} en la columna ${colFO} (índice 0).\n` +
+      `  Valores encontrados en esa columna: ${top}`);
+  }
+  console.log(`  columna ID ${colID} · columna Fleet Owner ${colFO}`);
   return unicos;
 }
 
@@ -200,8 +246,23 @@ function aFila(r) {
   console.log(`Hoy en Madrid ${hoy} · datos hasta ${dataHasta} · mes de la semana viva ${mesVivo}`);
   console.log(`Meses a publicar: ${meses.join(', ')}`);
 
-  const rosterSheet = await rosterDelSheet();
-  console.log(`Roster del sheet para ${CFG.fleet_owner}: ${rosterSheet.join(', ')}`);
+  let rosterSheet;
+  if (USA_SHEET) {
+    rosterSheet = await rosterDelSheet();
+    console.log(`Roster del sheet para ${CFG.fleet_owner}: ${rosterSheet.join(', ')}`);
+  } else {
+    rosterSheet = [...new Set(CFG.roster_companies)].sort((a,b) => a-b);
+    console.log(`Roster de config.roster_companies: ${rosterSheet.join(', ')}  (sin SHEET_CSV_URL)`);
+  }
+
+  // Exclusiones manuales: empresas que el sheet sigue asignando al Fleet Owner
+  // pero que ya no deben entrar en el bonus. Los meses ya congelados no se tocan.
+  const excl = CFG.excluded_companies || [];
+  if (excl.length) {
+    const quitadas = rosterSheet.filter(id => excl.includes(id));
+    rosterSheet = rosterSheet.filter(id => !excl.includes(id));
+    if (quitadas.length) console.log(`  excluidas por config.excluded_companies: ${quitadas.join(', ')}`);
+  }
 
   // El sheet define qué empresas pertenecen al Fleet Owner, pero al alcance del
   // bonus solo entran las que tienen algún vehículo vinilado en config.json.
