@@ -1,0 +1,38 @@
+name: Refresh GT tracker
+
+on:
+  schedule:
+    - cron: "0 7-22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-gt
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Construir docs/index.html con datos a dia vencido
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_WAREHOUSE_ID: ${{ secrets.DATABRICKS_WAREHOUSE_ID }}
+          SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
+        run: node build.js
+
+      - name: Commit si hay cambios
+        run: |
+          git config user.name  "gt-tracker-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs snapshots
+          git diff --cached --quiet || (git commit -m "chore: GT tracker refresh $(TZ=Europe/Madrid date '+%F %H:%M')" && git push)
