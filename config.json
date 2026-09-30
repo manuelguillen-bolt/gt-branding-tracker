@@ -1,0 +1,44 @@
+{
+  "fleet_owner": "GLOBAL TRANSPORT",
+  "city_id": 150,
+  "first_month": "2026-07",
+  "timezone": "Europe/Madrid",
+
+  "_comentario_umbrales": "Leídos de las condiciones reales de la campaña de Madrid: rank 0 exige 40h online y 20h de peak, rank 1 exige 55h y 30h, y ambos un acceptance rate de 0,85.",
+  "thresholds": {
+    "t1": { "oh": 40, "pk": 20 },
+    "t2": { "oh": 55, "pk": 30 },
+    "ar_min": 0.85
+  },
+
+  "_comentario_cohortes": "Base del rank 0 más los 2 puntos del rank 1.",
+  "cohorts": {
+    "A": { "t1": 10, "t2": 12 },
+    "B": { "t1": 8,  "t2": 10 },
+    "C": { "t1": 6,  "t2": 8  }
+  },
+  "default_cohort": "A",
+
+  "_comentario_vehiculos": "Lista explícita de vehículos vinilados. No se deriva de car_branding_periods porque esa tabla conserva períodos aprobados de coches que ya retiraron el vinilo, como los de AUTOS CARAZO. Añade o quita entradas aquí cuando cambie la flota vinilada. car_ids agrupa los distintos IDs de una misma matrícula cuando el registro se borró y se recreó.",
+  "vehicles": [
+    { "plate": "6415-KRG", "car_ids": [4661360],            "company_id": 47732,  "cohort": "A",  "cohort_src": "confirmada",    "cohort_det": "Inscrito en campañas Cohort A entre sep 2025 y mar 2026" },
+    { "plate": "8521-LWZ", "car_ids": [3776040],            "company_id": 65039,  "cohort": null, "cohort_src": "sin verificar", "cohort_det": "El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte" },
+    { "plate": "8541-LWZ", "car_ids": [3773146],            "company_id": 65039,  "cohort": null, "cohort_src": "sin verificar", "cohort_det": "El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte" },
+    { "plate": "4387-MDX", "car_ids": [5005656],            "company_id": 87971,  "cohort": "A",  "cohort_src": "confirmada",    "cohort_det": "Inscrito en campañas Cohort A entre sep 2025 y mar 2026" },
+    { "plate": "2555-LWJ", "car_ids": [5531329, 11047222],  "company_id": 93471,  "cohort": null, "cohort_src": "sin verificar", "cohort_det": "El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte" },
+    { "plate": "1473-MBX", "car_ids": [11016344],           "company_id": 93471,  "cohort": null, "cohort_src": "sin verificar", "cohort_det": "El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte" },
+    { "plate": "0709-LCM", "car_ids": [9485922],            "company_id": 223891, "cohort": "A",  "cohort_src": "reasignada",    "cohort_det": "Su historial es Cohort C (nov 2025 – mar 2026); se le aplica Cohort A por decisión comercial" }
+  ],
+
+  "_comentario_empresas": "Nombre corto por company_id para los encabezados. Si el sheet de grouping añade una empresa nueva, el build avisa en el log para que la añadas aquí.",
+  "companies": {
+    "47732":  "Álvaro Carlos Zambrano Trillo",
+    "65039":  "Carlos Azorin Fuentes",
+    "87971":  "ALEXTRENADO S.L",
+    "93471":  "Marcos González Ochoa",
+    "223891": "José Antonio Ramos Hernández",
+    "202022": "AEROGATE TRAVEL S.L",
+    "220826": "AUTOS CARAZO Servicio de Transporte Especial SL",
+    "66355":  "GLOBAL TRANSPORT ONE MGM S.L."
+  }
+}

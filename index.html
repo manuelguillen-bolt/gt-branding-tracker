@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Transport Branding Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#2A9C64; --dark:#0C2C1C; --white:#FFFFFF;
+    --g-14:rgba(42,156,100,.14); --g-07:rgba(42,156,100,.07); --g-40:rgba(42,156,100,.40);
+    --ink:#0C2C1C; --ink-2:#4A6B5B; --ink-3:#8CA69A;
+    --line:#E4EBE7; --line-2:#CFDCD5; --surf:#F7FAF9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    background:var(--white);color:var(--ink);font-size:14px;line-height:1.45;
+    -webkit-font-smoothing:antialiased;font-feature-settings:'tnum'}
+
+  header{background:var(--dark);color:var(--white);padding:24px 40px 21px}
+  header h1{font-size:19px;font-weight:700;letter-spacing:-.35px;line-height:1.2}
+  header .sub{font-size:12px;color:#8FB4A1;margin-top:6px;font-weight:500}
+
+  .bar{background:var(--white);border-bottom:1px solid var(--line);padding:13px 40px;
+       display:flex;align-items:center;gap:13px;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+  .bar label{font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.7px}
+  .bar select{background:var(--white);color:var(--ink);border:1px solid var(--line-2);border-radius:7px;
+    padding:8px 34px 8px 13px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A6B5B' stroke-width='1.7' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center}
+  .bar select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--g-14)}
+  .bar .sp{margin-left:auto}
+  .state{font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:11px;white-space:nowrap}
+  .state.frz{background:var(--g-14);color:var(--green)}
+  .state.live{background:#F3EFE2;color:#7A5E00}
+  .bar .upd{font-size:11.5px;color:var(--ink-2);font-weight:600;display:flex;align-items:center;gap:7px}
+  .bar .upd .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+  .wrap{max-width:1220px;margin:0 auto;padding:30px 40px 64px}
+
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:22px}
+  .kpi{background:var(--white);padding:18px 20px}
+  .kpi .l{font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px}
+  .kpi .v{font-size:25px;font-weight:700;color:var(--ink);letter-spacing:-.7px;line-height:1.05}
+  .kpi .s{font-size:11px;color:var(--ink-2);margin-top:7px;font-weight:500}
+  .kpi.p{background:var(--dark)} .kpi.p .l{color:#7FB79A} .kpi.p .v{color:var(--white)} .kpi.p .s{color:#8FB4A1}
+
+  .aviso{display:flex;align-items:flex-start;gap:11px;padding:12px 16px;border-radius:8px;
+         background:#FBF8EE;border:1px solid #E8DFC4;margin-bottom:20px;font-size:12px;color:#6B5410;line-height:1.6}
+  .aviso b{color:#4A3A08}
+  .aviso .ic{font-weight:800;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+             background:#7A5E00;color:#fff;padding:2px 8px;border-radius:9px;white-space:nowrap;flex-shrink:0}
+
+  .roster{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 16px;
+          border:1px solid var(--line);border-radius:8px;margin-bottom:20px}
+  .roster .rl{font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.7px;font-size:9.5px}
+  .chip{padding:3px 10px;border-radius:11px;background:var(--surf);color:var(--ink);font-weight:600;
+        border:1px solid var(--line);font-size:11px}
+  .frz-lbl{margin-left:auto;color:var(--ink-3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+
+  .legend{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:var(--surf);border-radius:8px}
+  .li{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-2);font-weight:500}
+  .sw{width:4px;height:15px;border-radius:2px;flex-shrink:0}
+  .sw.d{background:repeating-linear-gradient(180deg,#7A5E00 0 3px,transparent 3px 6px)}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  .co-card{overflow-x:auto;border:1px solid var(--line-2);border-radius:11px;margin-bottom:22px;
+           box-shadow:0 1px 2px rgba(12,44,28,.04)}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+  td{padding:0 13px;height:38px;vertical-align:middle}
+  td.n{text-align:right}
+
+  tr.co td{background:var(--dark);color:var(--white);height:48px;font-weight:800;font-size:14.5px;letter-spacing:-.2px}
+  tr.co .ci{font-weight:500;color:#8FB4A1;font-size:11px;margin-left:10px;letter-spacing:0}
+  tr.co .amt{font-size:16px;font-weight:800}
+
+  tr.pl td{background:var(--green);height:46px}
+  .pl-in{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .pl-tag{font-size:16px;font-weight:800;color:var(--white);letter-spacing:.5px}
+  .pl-meta{font-size:10.5px;color:rgba(255,255,255,.78);font-weight:600}
+  .coh{font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:10px;letter-spacing:.4px;
+       text-transform:uppercase;white-space:nowrap}
+  .coh.coh-ok{background:rgba(255,255,255,.22);color:#fff}
+  .coh.coh-asum{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px dashed rgba(255,255,255,.5)}
+  .pl-r{margin-left:auto;display:flex;align-items:baseline;gap:22px}
+  .pl-r .k{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.7px;margin-right:7px}
+  .pl-r .v{font-size:14px;font-weight:800;color:var(--white)}
+
+  tr.hd td{background:#E9EFEC;border-bottom:1px solid var(--line-2);height:34px;padding-top:5px;padding-bottom:5px}
+  .hl{font-size:10px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.85px;line-height:1.25}
+  .hs{display:block;font-size:9px;font-weight:600;color:var(--ink-2);letter-spacing:.3px;text-transform:none}
+
+  tr.w td{border-bottom:1px solid var(--line)}
+  tr.w:hover td{background:#FBFDFC}
+  tr.w td.wk{border-left:3px solid transparent;white-space:nowrap}
+  tr.w.t2 td.wk{border-left-color:var(--green)}
+  tr.w.t1 td.wk{border-left-color:var(--g-40)}
+  tr.w.t0 td.wk{border-left-color:var(--line-2)}
+  tr.w.cur td{background:#FEFCF5}
+  tr.w.cur:hover td{background:#FBF8EE}
+  tr.w.cur td.wk{border-left:3px dashed #7A5E00}
+  td.wk .num{font-weight:700;color:var(--ink);font-size:12px}
+  td.wk .rng{color:var(--ink-3);font-size:10.5px;margin-left:8px;font-weight:500}
+  td.wk .vivo{display:inline-block;font-size:9px;font-weight:800;color:#7A5E00;background:#F3EFE2;
+              padding:2px 7px;border-radius:8px;margin-left:8px;text-transform:uppercase;letter-spacing:.5px}
+  td.val{font-weight:600;color:var(--ink)}
+  td.val.miss{color:var(--ink-3);font-weight:500}
+  td.dim{color:var(--ink-3);font-weight:500}
+  .rej{font-weight:700;color:var(--ink)} .rej-o{color:var(--ink-3);font-weight:500;font-size:11px}
+
+  .lvl{display:inline-block;padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap}
+  .lvl.t2{background:var(--g-14);color:var(--green)}
+  .lvl.t1{background:var(--g-07);color:#1D7A4C}
+  .lvl.t0{background:#F1F4F2;color:var(--ink-3)}
+  .lvl.cur{background:#F3EFE2;color:#7A5E00}
+  .falta{display:block;font-size:9.5px;color:var(--ink-3);font-weight:500;margin-top:2px}
+  td.bo{font-weight:700;color:var(--ink);white-space:nowrap;background:var(--g-07)}
+  td.bo.t2{background:var(--g-14)}
+  td.bo.z{font-weight:500;color:var(--ink-3);background:transparent}
+  td.na{color:var(--ink-3);font-size:11px;font-weight:500}
+  .prov{font-size:9px;font-weight:800;color:#7A5E00;text-transform:uppercase;letter-spacing:.4px;margin-left:5px}
+
+  tr.co-tot td{background:var(--surf);border-top:2px solid var(--line-2);height:40px;font-weight:700;font-size:12px}
+  tr.co-tot .lbl{font-size:9.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.7px}
+  tr.tot td{background:var(--dark);color:var(--white);font-weight:700;font-size:13.5px;height:44px}
+
+  .mtot{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+        background:var(--dark);color:var(--white);border-radius:11px;padding:18px 24px;margin-top:26px}
+  .mtot .ml{font-size:11px;font-weight:700;color:#7FB79A;text-transform:uppercase;letter-spacing:.8px}
+  .mtot .mv{font-size:24px;font-weight:700;letter-spacing:-.6px;margin-top:3px}
+  .mtot .mr{display:flex;gap:34px;flex-wrap:wrap}
+  .mtot .mr .mv{font-size:16px;color:#D8E8E0}
+
+  .note{background:var(--surf);border-left:3px solid var(--green);padding:14px 18px;border-radius:0 7px 7px 0;
+        font-size:12px;color:var(--ink-2);line-height:1.75;margin-top:20px}
+  .note strong{color:var(--ink);font-weight:700}
+  .note.d{border-left-color:var(--dark)}
+  .note code{background:var(--white);padding:1.5px 5px;border-radius:3px;font-size:10.5px;border:1px solid var(--line);color:var(--ink)}
+  .formula{background:var(--white);border:1px solid var(--line-2);border-radius:7px;padding:11px 14px;
+           margin:10px 0;font-size:12px;color:var(--ink);font-weight:600;text-align:center}
+
+  .sec{margin-bottom:32px}
+  .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:13px;margin-top:14px}
+  .step{border:1px solid var(--line);border-radius:9px;padding:15px 17px}
+  .step .sn{font-size:9.5px;font-weight:800;color:var(--green);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
+  .step .st{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .step .sd{font-size:11.5px;color:var(--ink-2);line-height:1.65}
+
+  @media(max-width:900px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    header,.bar,.wrap{padding-left:20px;padding-right:20px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Global Transport — Branding Tracker</h1>
+  <div class="sub">Madrid · Cohort A · Cálculo de campaña replicado · Bonus pagadero a la flota</div>
+</header>
+
+<div class="bar">
+  <label for="mf">Período</label>
+  <select id="mf" onchange="render()"></select>
+  <span id="st"></span>
+  <label for="cf" style="margin-left:6px">Cohorte sin verificar</label>
+  <select id="cf" onchange="render()">
+    <option value="A" selected>Cohort A · 10 + 2</option>
+    <option value="B">Cohort B · 8 + 2</option>
+    <option value="C">Cohort C · 6 + 2</option>
+  </select>
+  <div class="sp"></div>
+  <div class="upd" id="upd"></div>
+</div>
+
+<div class="wrap" id="main"></div>
+
+<script>
+/* ═══ Frescura: el dashboard se construye a día vencido ═══
+   DATA_HASTA es el último día con datos completos en el ETL.
+   Las semanas cuyo domingo es posterior a esa fecha están EN CURSO. */
+const DATA_HASTA='2026-09-29';
+const GENERADO='2026-09-30 16:34 Madrid';
+
+const CO={"47732":"Álvaro Carlos Zambrano Trillo","65039":"Carlos Azorin Fuentes","87971":"ALEXTRENADO S.L","93471":"Marcos González Ochoa","223891":"José Antonio Ramos Hernández"};
+const CARID={"6415-KRG":"4661360","8521-LWZ":"3776040","8541-LWZ":"3773146","4387-MDX":"5005656","2555-LWJ":"5531329 + 11047222","1473-MBX":"11016344","0709-LCM":"9485922"};
+
+/* Roster congelado al cierre de cada mes. El mes en curso se relee en cada build. */
+const ROSTER={"7":{"ids":[47732,65039,87971,93471,223891],"at":"2026-08-03","cerrado":true},"8":{"ids":[65039,87971,93471,223891],"at":"2026-09-01","cerrado":true},"9":{"ids":[65039,87971,93471,223891],"at":"2026-09-28","cerrado":true},"10":{"ids":[65039,87971,93471,223891],"at":null,"cerrado":false}};
+const inScope=(cid,m)=>ROSTER[m]&&ROSTER[m].ids.includes(cid);
+
+/* Umbrales leídos de las condiciones reales de la campaña de Madrid */
+const T2={"oh":55,"pk":30}, T1={"oh":40,"pk":20}, AR_MIN=0.85;
+const COHORTE={"A":{"t1":10,"t2":12},"B":{"t1":8,"t2":10},"C":{"t1":6,"t2":8}};
+const CAR_COH={"6415-KRG":{"c":"A","src":"confirmada","det":"Inscrito en campañas Cohort A entre sep 2025 y mar 2026"},"8521-LWZ":{"c":null,"src":"sin verificar","det":"El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte"},"8541-LWZ":{"c":null,"src":"sin verificar","det":"El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte"},"4387-MDX":{"c":"A","src":"confirmada","det":"Inscrito en campañas Cohort A entre sep 2025 y mar 2026"},"2555-LWJ":{"c":null,"src":"sin verificar","det":"El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte"},"1473-MBX":{"c":null,"src":"sin verificar","det":"El vehículo nunca estuvo inscrito en una campaña, así que no consta su cohorte"},"0709-LCM":{"c":"A","src":"reasignada","det":"Su historial es Cohort C (nov 2025 – mar 2026); se le aplica Cohort A por decisión comercial"}};
+let COH_DEF='A';
+const cohOf=reg=>(CAR_COH[reg]&&CAR_COH[reg].c)||COH_DEF;
+const nivelOf=(oh,pk,ar)=> (ar==null||ar<AR_MIN) ? 0
+  : (oh>=T2.oh && pk>=T2.pk) ? 2 : (oh>=T1.oh && pk>=T1.pk) ? 1 : 0;
+const pctOf=(reg,nivel)=> nivel===0 ? 0 : COHORTE[cohOf(reg)]['t'+nivel];
+
+/* [reg, cid, wk_end, mth, oh, peak, trips, riderRej, drvRej, drvOpt, ar, gmv] */
+const RAW=[["6415-KRG",47732,"2026-07-05",7,50.54,34.52,126,27,1,5,0.9935,1840.9],["6415-KRG",47732,"2026-07-12",7,74.51,49.82,182,38,0,12,1,2744],["6415-KRG",47732,"2026-07-19",7,42.68,11.57,101,17,0,7,1,1411.9],["6415-KRG",47732,"2026-07-26",7,72.36,36.51,193,16,0,15,1,2548.85],["8521-LWZ",65039,"2026-07-05",7,58.46,41.72,95,21,0,23,1,1949.85],["8521-LWZ",65039,"2026-07-12",7,61.02,46.7,92,17,0,26,1,1864.68],["8521-LWZ",65039,"2026-07-19",7,59.12,41.36,92,23,0,28,1,1741.8],["8521-LWZ",65039,"2026-07-26",7,62.78,44.53,99,18,1,26,0.9915,1891.85],["8541-LWZ",65039,"2026-07-05",7,52.3,38.12,92,18,2,30,0.9821,1833.4],["8541-LWZ",65039,"2026-07-12",7,57.02,38.88,114,16,0,28,1,2200.4],["8541-LWZ",65039,"2026-07-19",7,53.96,37.56,97,31,0,25,1,1855.7],["8541-LWZ",65039,"2026-07-26",7,55.92,35.4,96,9,1,16,0.9906,1790.2],["4387-MDX",87971,"2026-07-05",7,71.02,36.63,125,32,7,69,0.9573,1892.75],["4387-MDX",87971,"2026-07-19",7,16.47,14.72,21,3,2,25,0.9231,388.8],["4387-MDX",87971,"2026-07-26",7,90.19,48.79,119,21,5,61,0.9655,2060.55],["1473-MBX",93471,"2026-07-05",7,0,0,0,0,0,0,null,0],["2555-LWJ",93471,"2026-07-05",7,95.51,50.12,155,16,7,70,0.9607,2613.95],["2555-LWJ",93471,"2026-07-12",7,122.11,60.17,224,44,10,77,0.964,3374.95],["2555-LWJ",93471,"2026-07-19",7,119.56,58.91,204,48,3,80,0.9882,2879],["2555-LWJ",93471,"2026-07-26",7,126.69,64.94,209,28,3,83,0.9875,3179.55],["0709-LCM",223891,"2026-07-05",7,102.05,55.9,198,44,7,38,0.9719,3130.75],["0709-LCM",223891,"2026-07-12",7,76.03,48.47,148,28,7,28,0.9617,2309.8],["0709-LCM",223891,"2026-07-19",7,93.55,54.1,179,26,6,39,0.9716,2552.2],["0709-LCM",223891,"2026-07-26",7,107.63,59.24,187,41,9,27,0.962,2642.5],["6415-KRG",47732,"2026-08-02",8,54.44,28.79,141,21,0,7,1,1838.75],["6415-KRG",47732,"2026-08-09",8,78.32,41.69,214,45,1,8,0.9962,2906.4],["6415-KRG",47732,"2026-08-16",8,31.26,28.89,98,20,1,3,0.9916,1406.25],["6415-KRG",47732,"2026-08-23",8,65.42,32.07,203,31,0,57,1,2614.05],["6415-KRG",47732,"2026-08-30",8,77.43,45.76,212,44,5,78,0.9808,3022.8],["8521-LWZ",65039,"2026-08-02",8,60.69,33.85,92,27,1,28,0.9917,1858.45],["8521-LWZ",65039,"2026-08-09",8,0.7,0.46,1,0,0,0,1,36.9],["8521-LWZ",65039,"2026-08-23",8,62.93,43.61,101,20,1,30,0.9918,1977.2],["8521-LWZ",65039,"2026-08-30",8,61.79,45.17,102,17,3,32,0.9754,2101.15],["8541-LWZ",65039,"2026-08-02",8,49.66,30.73,89,25,1,27,0.9913,1765.4],["8541-LWZ",65039,"2026-08-30",8,57.46,39.54,111,25,0,40,1,2184.3],["4387-MDX",87971,"2026-08-02",8,91.04,46.77,143,27,1,29,0.9942,2322.6],["4387-MDX",87971,"2026-08-09",8,99.28,54.34,155,26,1,64,0.9945,2629.05],["4387-MDX",87971,"2026-08-16",8,80.01,45.84,153,32,0,48,1,2321.55],["4387-MDX",87971,"2026-08-23",8,102.23,55.45,174,43,1,53,0.9954,2641.05],["4387-MDX",87971,"2026-08-30",8,95.85,49.09,158,33,10,91,0.9502,2501.2],["2555-LWJ",93471,"2026-08-02",8,120.61,60.16,175,27,2,37,0.9902,2624.15],["2555-LWJ",93471,"2026-08-09",8,116.41,58.18,179,30,2,52,0.9905,2832.25],["2555-LWJ",93471,"2026-08-16",8,100.59,47.83,162,27,3,40,0.9844,2390.2],["2555-LWJ",93471,"2026-08-23",8,63.27,30.98,117,19,0,12,1,1551.05],["2555-LWJ",93471,"2026-08-30",8,59.53,32.69,108,18,2,23,0.9844,1546.7],["0709-LCM",223891,"2026-08-02",8,97.53,60.8,194,32,4,44,0.9826,2658.25],["0709-LCM",223891,"2026-08-09",8,70.48,43.46,137,33,9,74,0.9497,1833.95],["0709-LCM",223891,"2026-08-16",8,79.71,47.85,152,48,10,118,0.9524,2203.6],["0709-LCM",223891,"2026-08-23",8,75.45,41.47,148,35,1,34,0.9946,1928.45],["0709-LCM",223891,"2026-08-30",8,97.28,56.38,185,52,0,99,1,2679.35],["6415-KRG",47732,"2026-09-06",9,40.03,33.4,97,15,0,33,1,1619],["6415-KRG",47732,"2026-09-13",9,44.08,33.82,109,16,1,83,0.9921,2138.45],["6415-KRG",47732,"2026-09-20",9,48.65,36.7,113,27,1,59,0.9929,2109.75],["6415-KRG",47732,"2026-09-27",9,38.83,32.16,103,19,1,63,0.9919,2093.95],["8521-LWZ",65039,"2026-09-06",9,58.86,40.47,96,29,1,37,0.9921,2089.7],["8521-LWZ",65039,"2026-09-13",9,55.9,33.4,83,38,2,57,0.9837,2149.95],["8521-LWZ",65039,"2026-09-20",9,64.19,37.75,108,57,1,31,0.994,2363.95],["8521-LWZ",65039,"2026-09-27",9,60.98,41.22,97,33,1,33,0.9924,2154.05],["8541-LWZ",65039,"2026-09-06",9,55.54,41.59,116,14,0,51,1,2263.7],["8541-LWZ",65039,"2026-09-13",9,43.48,31.03,83,22,1,57,0.9906,2047.5],["8541-LWZ",65039,"2026-09-20",9,56.9,35.44,111,39,0,32,1,2323.7],["8541-LWZ",65039,"2026-09-27",9,53.46,37.62,103,32,0,19,1,2117.45],["4387-MDX",87971,"2026-09-06",9,100.42,53.8,186,50,24,116,0.9077,2928.05],["4387-MDX",87971,"2026-09-13",9,82.91,51.51,152,54,7,76,0.9671,2606.15],["4387-MDX",87971,"2026-09-20",9,122.27,68.09,221,58,4,74,0.9859,3770.7],["4387-MDX",87971,"2026-09-27",9,105.26,59.66,208,29,7,73,0.9713,3412.7],["2555-LWJ",93471,"2026-09-06",9,58.58,30.79,113,13,0,9,1,1676.5],["2555-LWJ",93471,"2026-09-13",9,106.27,51.87,168,36,1,47,0.9951,2860.7],["2555-LWJ",93471,"2026-09-20",9,118.52,57.06,177,32,6,71,0.9721,3310.55],["2555-LWJ",93471,"2026-09-27",9,106.63,57.17,174,35,6,71,0.9721,3030.25],["0709-LCM",223891,"2026-09-06",9,106.14,48.77,213,65,4,181,0.9858,3192.95],["0709-LCM",223891,"2026-09-13",9,91.4,48.92,175,66,12,46,0.9526,2771.6],["0709-LCM",223891,"2026-09-20",9,97.65,48.35,194,79,20,56,0.9317,3029.8],["0709-LCM",223891,"2026-09-27",9,60.12,32.64,116,54,5,21,0.9714,1806.3],["6415-KRG",47732,"2026-10-04",10,20.81,7.54,42,6,0,18,1,653.8],["8521-LWZ",65039,"2026-10-04",10,21.03,6,27,23,0,13,1,577.95],["8541-LWZ",65039,"2026-10-04",10,15.78,5.07,30,3,1,16,0.9706,514.25],["4387-MDX",87971,"2026-10-04",10,28.53,7.07,49,10,4,26,0.9365,785.2],["2555-LWJ",93471,"2026-10-04",10,39.03,9.84,56,14,3,39,0.9589,982.8],["0709-LCM",223891,"2026-10-04",10,9.47,4.48,15,13,0,9,1,250.6]];
+
+const enCurso=wke=>wke>DATA_HASTA;
+const fila=r=>{
+  const nivel=nivelOf(r[4],r[5],r[10]), pct=pctOf(r[0],nivel);
+  return {reg:r[0],cid:r[1],wke:r[2],mth:r[3],oh:r[4],peak:r[5],trips:r[6],
+          rid:r[7],drv:r[8],drvOpt:r[9],ar:r[10],gmv:r[11],
+          nivel,pct,coh:cohOf(r[0]),bonus:+(pct/100*r[11]).toFixed(2),
+          curso:enCurso(r[2])};
+};
+let D=[], ALL=[];
+function construir(){
+  D   = RAW.filter(r=>inScope(r[1],r[3])).map(fila);
+  ALL = RAW.map(fila);
+}
+
+const eur=n=>(!n||isNaN(n))?'—':'€'+n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur0=n=>(!n||isNaN(n))?'€0':'€'+n.toLocaleString('es-ES',{maximumFractionDigits:0});
+const num=(n,d=0)=>(n==null||isNaN(n))?'—':n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pc=n=>n==null?'—':(n*100).toFixed(1)+'%';
+const hm=h=>h==null?'—':Math.floor(h)+'h '+String(Math.round((h-Math.floor(h))*60)).padStart(2,'0');
+const MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MESL=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const fechaL=s=>{const d=new Date(s+'T00:00:00Z');return d.getUTCDate()+' '+MES[d.getUTCMonth()];};
+
+function isoWeek(d){
+  const t=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
+  const dn=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-dn);
+  const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  return Math.ceil(((t-y0)/86400000+1)/7);
+}
+function wkInfo(we){
+  const end=new Date(we+'T00:00:00Z'); const st=new Date(end); st.setUTCDate(end.getUTCDate()-6);
+  return {n:'W'+isoWeek(st),
+    rng:st.getUTCDate()+' '+MES[st.getUTCMonth()]+' – '+end.getUTCDate()+' '+MES[end.getUTCMonth()]};
+}
+function agg(rows){
+  const bonus=rows.reduce((s,r)=>s+r.bonus,0), gmv=rows.reduce((s,r)=>s+r.gmv,0);
+  const ar=rows.filter(r=>r.ar!=null&&r.trips>5);
+  return {bonus,gmv,rides:rows.reduce((s,r)=>s+r.trips,0),
+    cars:new Set(rows.map(r=>r.reg)).size,
+    paid:new Set(rows.filter(r=>r.bonus>0).map(r=>r.reg)).size,
+    avgAr:ar.length?ar.reduce((s,r)=>s+r.ar,0)/ar.length:null,
+    kick:gmv?bonus/gmv:0,
+    prov:rows.some(r=>r.curso)};
+}
+function lvlTag(r){
+  if(r.curso){
+    const falta=[];
+    if(r.oh<T1.oh) falta.push('faltan '+hm(T1.oh-r.oh)+' online');
+    else if(r.peak<T1.pk) falta.push('faltan '+hm(T1.pk-r.peak)+' de peak');
+    else if(r.nivel===1) falta.push('a '+hm(T2.oh-r.oh)+' del nivel 2');
+    return `<span class="lvl cur">En curso</span>`+(falta.length?`<span class="falta">${falta[0]}</span>`:'');
+  }
+  if(r.nivel===2) return `<span class="lvl t2">Nivel 2 · ${r.pct}%</span>`;
+  if(r.nivel===1) return `<span class="lvl t1">Nivel 1 · ${r.pct}%</span>`;
+  return '<span class="lvl t0">No cualifica</span>';
+}
+const hdrBar=cols=>`<tr class="hd">${cols.map(c=>
+  `<td class="${c.a||''}"><span class="hl">${c.t}${c.s?`<span class="hs">${c.s}</span>`:''}</span></td>`).join('')}</tr>`;
+const titleRow=(txt,span,right='')=>
+  `<tr class="co"><td colspan="${span}">${txt}</td>${right?`<td class="n"><span class="amt">${right}</span></td>`:''}</tr>`;
+
+const WCOLS=[
+  {t:'Semana'},
+  {t:'Online', s:'≥40 · 55h', a:'n'},
+  {t:'Peak',   s:'≥20 · 30h', a:'n'},
+  {t:'Viajes', s:'finalizados', a:'n'},
+  {t:'Rechazos', s:'penaliza · opcional', a:'n'},
+  {t:'AR',     s:'≥85%',      a:'n'},
+  {t:'GMV',    a:'n'},
+  {t:'Nivel'},
+  {t:'Bonus',  a:'n'}
+];
+
+// Meses presentes en los datos, y el de la semana en curso
+const mesesConDatos=()=>[...new Set(RAW.filter(r=>inScope(r[1],r[3])).map(r=>r[3]))].sort((a,b)=>a-b);
+const mesEnCurso=()=>{
+  const viva=RAW.filter(r=>enCurso(r[2])).map(r=>r[3]);
+  return viva.length?Math.max(...viva):Math.max(...mesesConDatos());
+};
+
+function monthView(m){
+  const label=MESL[m-1].charAt(0).toUpperCase()+MESL[m-1].slice(1)+' 2026';
+  const rows=D.filter(r=>r.mth===m);
+  const k=agg(rows);
+  const weeks=[...new Set(rows.map(r=>r.wke))].sort();
+  const R=ROSTER[m]||{ids:[],cerrado:false};
+  const wCur=weeks.filter(w=>enCurso(w));
+
+  let h=`<div class="kpis">
+    <div class="kpi p"><div class="l">Bonus a pagar</div><div class="v">${eur(k.bonus)}</div><div class="s">${label} · ${weeks.length} ${weeks.length===1?'semana':'semanas'}${k.prov?' · incluye provisional':''}</div></div>
+    <div class="kpi"><div class="l">Coches con bonus</div><div class="v">${k.paid}<span style="font-size:15px;color:var(--ink-3);font-weight:600"> / ${k.cars}</span></div><div class="s">Vinilados con actividad</div></div>
+    <div class="kpi"><div class="l">GMV branded</div><div class="v">${eur0(k.gmv)}</div><div class="s">Base del cálculo</div></div>
+    <div class="kpi"><div class="l">Branding kickback</div><div class="v">${(k.kick*100).toFixed(1)}%</div><div class="s">Bonus / GMV · máx 12%</div></div>
+    <div class="kpi"><div class="l">AR medio</div><div class="v">${pc(k.avgAr)}</div><div class="s">Fórmula de campaña</div></div>
+  </div>`;
+
+  if(wCur.length){
+    const wi=wkInfo(wCur[0]);
+    h+=`<div class="aviso"><span class="ic">Semana en curso</span>
+      <div>La semana <b>${wi.n} · ${wi.rng}</b> está abierta y solo acumula los días ya cerrados, hasta el <b>${fechaL(DATA_HASTA)}</b>. Su bonus entra en el total del mes marcado como provisional y seguirá subiendo con cada actualización. Los umbrales son semanales, así que hasta acumular 40h online y 20h de peak la semana figura sin nivel.</div></div>`;
+  }
+
+  h+=`<div class="roster"><span class="rl">Alcance del mes</span>`;
+  for(const id of R.ids) h+=`<span class="chip">${CO[id]} · ${id}</span>`;
+  h+=`<span class="frz-lbl">${R.cerrado?'Congelado '+R.at:'Mes abierto · se relee el sheet'}</span></div>`;
+
+  h+=`<div class="legend">
+    <div class="li"><span class="sw" style="background:var(--green)"></span>Nivel 2 · 55h online + 30h peak + AR 85%</div>
+    <div class="li"><span class="sw" style="background:var(--g-40)"></span>Nivel 1 · 40h online + 20h peak + AR 85%</div>
+    <div class="li"><span class="sw" style="background:var(--line-2)"></span>No cualifica</div>
+    ${wCur.length?'<div class="li"><span class="sw d"></span>Semana en curso · bonus provisional</div>':''}
+  </div>`;
+
+  const byCo={};
+  for(const r of rows){ (byCo[r.cid]??={}); (byCo[r.cid][r.reg]??=[]).push(r); }
+  const coIds=Object.keys(byCo).map(Number)
+    .sort((a,b)=>Object.values(byCo[b]).flat().reduce((s,r)=>s+r.bonus,0)
+                -Object.values(byCo[a]).flat().reduce((s,r)=>s+r.bonus,0));
+
+  for(const cid of coIds){
+    const cars=byCo[cid], flat=Object.values(cars).flat();
+    const coB=flat.reduce((s,r)=>s+r.bonus,0), coG=flat.reduce((s,r)=>s+r.gmv,0),
+          coR=flat.reduce((s,r)=>s+r.trips,0), nCars=Object.keys(cars).length;
+
+    h+=`<div class="co-card"><table><tbody>`;
+    h+=titleRow(`${CO[cid]}<span class="ci">Company #${cid} · ${nCars} ${nCars===1?'vehículo':'vehículos'}</span>`,8,eur(coB));
+
+    const regs=Object.keys(cars).sort((a,b)=>cars[b].reduce((s,r)=>s+r.bonus,0)-cars[a].reduce((s,r)=>s+r.bonus,0));
+    for(const reg of regs){
+      const cr=cars[reg].slice().sort((a,b)=>a.wke<b.wke?-1:1);
+      const cb=cr.reduce((s,r)=>s+r.bonus,0), cg=cr.reduce((s,r)=>s+r.gmv,0);
+      const cerradas=cr.filter(r=>!r.curso);
+      const okW=cerradas.filter(r=>r.bonus>0).length;
+      const ch=CAR_COH[reg]||{src:'sin verificar'};
+      const chCls=ch.src==='sin verificar'?'coh-asum':'coh-ok';
+
+      h+=`<tr class="pl"><td colspan="9"><div class="pl-in">
+            <span class="pl-tag">${reg}</span>
+            <span class="coh ${chCls}" title="${ch.det||''}">Cohort ${cohOf(reg)} · ${ch.src}</span>
+            <span class="pl-meta">car_id ${CARID[reg]||'—'} · ${okW} de ${cerradas.length} semanas cerradas cualificadas</span>
+            <span class="pl-r">
+              <span><span class="k">GMV</span><span class="v">${eur(cg)}</span></span>
+              <span><span class="k">Bonus</span><span class="v">${cb>0?eur(cb):'—'}</span></span>
+            </span></div></td></tr>`;
+      h+=hdrBar(WCOLS);
+
+      for(const r of cr){
+        const w=wkInfo(r.wke);
+        const tc=r.nivel===2?'t2':(r.nivel===1?'t1':'t0');
+        h+=`<tr class="w ${tc}${r.curso?' cur':''}">
+          <td class="wk"><span class="num">${w.n}</span><span class="rng">${w.rng}</span>${r.curso?'<span class="vivo">en curso</span>':''}</td>
+          <td class="n val${r.oh<T1.oh&&!r.curso?' miss':''}">${hm(r.oh)}</td>
+          <td class="n val${r.peak<T1.pk&&!r.curso?' miss':''}">${hm(r.peak)}</td>
+          <td class="n dim">${r.trips?num(r.trips):'—'}</td>
+          <td class="n"><span class="rej">${r.drv}</span><span class="rej-o"> · ${r.drvOpt}</span></td>
+          <td class="n val${(r.ar!=null&&r.ar<AR_MIN)?' miss':''}">${pc(r.ar)}</td>
+          <td class="n val">${r.gmv?eur(r.gmv):'—'}</td>
+          <td>${lvlTag(r)}</td>
+          <td class="bo n ${r.nivel===2?'t2':''}${r.bonus?'':' z'}">${r.bonus?eur(r.bonus)+(r.curso?'<span class="prov">prov.</span>':''):'—'}</td></tr>`;
+      }
+    }
+    h+=`<tr class="co-tot"><td colspan="3"><span class="lbl">Total ${CO[cid]}</span></td>
+        <td class="n">${num(coR)}</td><td></td><td></td>
+        <td class="n">${eur(coG)}</td><td></td>
+        <td class="n" style="color:var(--green)">${eur(coB)}</td></tr>`;
+    h+=`</tbody></table></div>`;
+  }
+
+  const cerr=agg(rows.filter(r=>!r.curso));
+  h+=`<div class="mtot">
+    <div><div class="ml">Total ${label}${k.prov?' · provisional':''}</div><div class="mv">${eur(k.bonus)}</div></div>
+    <div class="mr">
+      ${k.prov?`<div><div class="ml">Solo semanas cerradas</div><div class="mv">${eur(cerr.bonus)}</div></div>`:''}
+      <div><div class="ml">GMV branded</div><div class="mv">${eur(k.gmv)}</div></div>
+      <div><div class="ml">Viajes</div><div class="mv">${num(k.rides)}</div></div>
+      <div><div class="ml">Branding kickback</div><div class="mv">${(k.kick*100).toFixed(1)}%</div></div>
+    </div></div>`;
+
+  h+=`<div class="note">
+    <strong>Frescura de los datos.</strong> El dashboard se construye a día vencido: contiene todos los días cerrados hasta el ${fechaL(DATA_HASTA)} incluido y se regenera cada hora entre las 9:00 y las 23:00 de Madrid. La visibilidad sigue siendo semanal de lunes a domingo, así que la semana viva aparece marcada como en curso.
+    <br><strong>Tasa de aceptación replicada de la campaña.</strong> Los coches de Global Transport no están inscritos en CarBranding, así que no tienen un <code>acceptance_rate</code> propio y se reproduce el que la campaña calcularía:
+    <div class="formula">AR = (viajes finalizados + rechazos del pasajero) ÷ (viajes finalizados + rechazos del pasajero + rechazos del conductor que penalizan)</div>
+    Los tres términos son intentos de pedido según cómo terminaron. <strong>Viajes finalizados</strong> son las carreras aceptadas y completadas, estado <code>finished</code>. <strong>Rechazos del pasajero</strong> son carreras que el conductor aceptó pero no se hicieron por el cliente, estados <code>client_cancelled</code> y <code>client_did_not_show</code>; suman en el numerador porque el conductor las había aceptado. <strong>Rechazos del conductor</strong> son las que declinó o no respondió, y solo penalizan si el intento no tenía regla de viaje opcional; los opcionales son la cifra en gris y la campaña los descarta. En Madrid el 91% de los rechazos son de ese tipo.
+    <br><strong>Horas.</strong> <code>SUM(total_adjusted_online_seconds)/3600</code> de <code>etl_category_driver_car_online_hours</code>, el campo prorrateado entre categorías, que reconcilia exacto con el Tiempo de conexión del Fleet Portal.
+    <br><strong>Ventanas pico.</strong> Lun–Mié 07–10h y 17–20h · Jue 07–10h y 17–24h · Vie 00–02h, 07–10h y 13–24h · Sáb y Dom 00–07h y 11–24h.
+  </div>`;
+  return h;
+}
+
+function summaryView(){
+  const meses=mesesConDatos();
+  const all=agg(D);
+
+  let h=`<div class="kpis">
+    <div class="kpi p"><div class="l">Bonus acumulado</div><div class="v">${eur(all.bonus)}</div><div class="s">Global Transport · ${meses.length} meses${all.prov?' · incluye provisional':''}</div></div>
+    <div class="kpi"><div class="l">GMV branded</div><div class="v">${eur0(all.gmv)}</div><div class="s">Base acumulada</div></div>
+    <div class="kpi"><div class="l">Branding kickback</div><div class="v">${(all.kick*100).toFixed(1)}%</div><div class="s">Bonus / GMV</div></div>
+    <div class="kpi"><div class="l">Viajes</div><div class="v">${num(all.rides)}</div><div class="s">AR medio ${pc(all.avgAr)}</div></div>
+    <div class="kpi"><div class="l">Coches vinilados</div><div class="v">${new Set(D.map(r=>r.reg)).size}</div><div class="s">En 4–5 empresas según mes</div></div>
+  </div>`;
+
+  h+=`<div class="sec"><div class="tbl-wrap"><table><tbody>`;
+  h+=titleRow('Bonus por mes',8);
+  h+=hdrBar([{t:'Mes'},{t:'Semanas',a:'n'},{t:'Empresas',a:'n'},{t:'Coches con bonus',a:'n'},
+             {t:'Viajes',a:'n'},{t:'GMV branded',a:'n'},{t:'Branding kickback',a:'n'},{t:'Bonus',a:'n'}]);
+  for(const m of meses){
+    const rs=D.filter(r=>r.mth===m), k=agg(rs);
+    const lbl=MESL[m-1].charAt(0).toUpperCase()+MESL[m-1].slice(1)+' 2026';
+    h+=`<tr class="w ${k.prov?'t0 cur':'t2'}">
+      <td class="wk"><span class="num">${lbl}</span>${k.prov?'<span class="vivo">en curso</span>':''}</td>
+      <td class="n dim">${new Set(rs.map(r=>r.wke)).size}</td>
+      <td class="n dim">${(ROSTER[m]||{ids:[]}).ids.length}</td>
+      <td class="n dim">${k.paid} / ${k.cars}</td><td class="n dim">${num(k.rides)}</td>
+      <td class="n val">${eur(k.gmv)}</td><td class="n val">${(k.kick*100).toFixed(1)}%</td>
+      <td class="bo n ${k.prov?'':'t2'}">${eur(k.bonus)}${k.prov?'<span class="prov">prov.</span>':''}</td></tr>`;
+  }
+  h+=`<tr class="tot"><td colspan="5">TOTAL ACUMULADO</td><td class="n">${eur(all.gmv)}</td>
+      <td class="n">${(all.kick*100).toFixed(1)}%</td><td class="n">${eur(all.bonus)}</td></tr>
+      </tbody></table></div></div>`;
+
+  h+=`<div class="sec"><div class="tbl-wrap"><table><tbody>`;
+  const cols=[{t:'Matrícula'},{t:'Empresa'}].concat(meses.map(m=>({t:MESL[m-1].slice(0,3),a:'n'})),[{t:'Total',a:'n'}]);
+  h+=titleRow('Bonus por vehículo y mes',cols.length-1);
+  h+=hdrBar(cols);
+  const regs=[...new Set(ALL.map(r=>r.reg))].map(reg=>{
+    const rs=ALL.filter(r=>r.reg===reg), cid=rs[0].cid;
+    const o={reg,cid,per:{}};
+    meses.forEach(m=>{o.per[m]=inScope(cid,m)?rs.filter(r=>r.mth===m).reduce((s,r)=>s+r.bonus,0):null;});
+    o.tot=meses.reduce((s,m)=>s+(o.per[m]||0),0); return o;
+  }).sort((a,b)=>b.tot-a.tot);
+  const cell=v=>v===null?'<td class="na n">fuera</td>':`<td class="n val">${v?eur(v):'—'}</td>`;
+  for(const o of regs){
+    h+=`<tr class="w ${o.tot?'t2':'t0'}"><td class="wk"><span class="num">${o.reg}</span></td>
+      <td class="dim" style="font-size:11.5px">${CO[o.cid]}</td>
+      ${meses.map(m=>cell(o.per[m])).join('')}
+      <td class="bo n ${o.tot?'t2':'z'}">${o.tot?eur(o.tot):'—'}</td></tr>`;
+  }
+  h+=`<tr class="tot"><td colspan="2">TOTAL</td>
+    ${meses.map(m=>`<td class="n">${eur(regs.reduce((s,o)=>s+(o.per[m]||0),0))}</td>`).join('')}
+    <td class="n">${eur(all.bonus)}</td></tr></tbody></table></div></div>`;
+
+  // Cohorte
+  h+=`<div class="sec"><div class="tbl-wrap"><table><tbody>`;
+  h+=titleRow('Cohorte aplicada a cada vehículo',5);
+  h+=hdrBar([{t:'Matrícula'},{t:'Cohorte'},{t:'Origen'},{t:'Nivel 1 · Nivel 2',a:'n'},{t:'Evidencia'}]);
+  const ORIG={confirmada:'Consta en su historial de campañas',
+              reasignada:'Cambiada por decisión comercial',
+              'sin verificar':'El coche nunca estuvo en campaña · se aplica la del selector'};
+  for(const reg of [...new Set(ALL.map(r=>r.reg))]){
+    const ch=CAR_COH[reg]||{src:'sin verificar'}, c=cohOf(reg);
+    const firme=ch.src!=='sin verificar';
+    h+=`<tr class="w ${firme?'t2':'t0'}">
+      <td class="wk"><span class="num">${reg}</span></td>
+      <td class="val">Cohort ${c}</td>
+      <td class="${firme?'val':'dim'}">${ORIG[ch.src]}</td>
+      <td class="n val">${COHORTE[c].t1}% · ${COHORTE[c].t2}%</td>
+      <td class="dim" style="font-size:11px">${ch.det||''}</td></tr>`;
+  }
+  h+=`</tbody></table></div></div>`;
+
+  // Cómo funciona
+  h+=`<div class="sec"><div class="tbl-wrap"><table><tbody>${titleRow('Cómo se actualiza y qué está verificado',1)}</tbody></table></div>
+    <div class="flow">
+      <div class="step"><div class="sn">Frescura</div><div class="st">Día vencido</div>
+        <div class="sd">Cada build incluye todos los días cerrados hasta el anterior. Primera pasada a las 9:00 de Madrid y luego cada hora hasta las 23:00, de modo que la semana en curso va creciendo a lo largo del día.</div></div>
+      <div class="step"><div class="sn">Frescura</div><div class="st">Mes por defecto</div>
+        <div class="sd">Al abrir se selecciona el mes al que pertenece la semana en curso, según la regla de atribución por domingo. Cuando un mes se cierra, el dashboard pasa solo al siguiente sin tocar nada.</div></div>
+      <div class="step"><div class="sn">Congelado</div><div class="st">Meses cerrados</div>
+        <div class="sd">Al cerrar un mes se escribe <code>snapshots/2026-MM.json</code> con las filas, el roster usado y los totales. A partir de ahí se sirve tal cual, sin recalcular ni releer el sheet de grouping, así que los importes pagados quedan inmunes a cambios de roster o backfills del ETL.</div></div>
+      <div class="step"><div class="sn">Verificado</div><div class="st">Fórmula del AR</div>
+        <div class="sd">99,0% de coincidencias exactas sobre 1,39 M de semanas-coche. El criterio de rechazo opcional acierta el 99,96%. En el contraste con 2476-LRN los tres contadores salieron idénticos a los de la campaña.</div></div>
+      <div class="step"><div class="sn">Verificado</div><div class="st">Umbrales y franjas</div>
+        <div class="sd">Leídos del JSON de condiciones de la campaña de Madrid: 40h y 20h de peak para el nivel 1, 55h y 30h para el nivel 2, AR mínimo 0,85. Las ventanas pico coinciden hora por hora.</div></div>
+      <div class="step"><div class="sn">Margen</div><div class="st">Precisión de las horas</div>
+        <div class="sd">Frente al valor que calcula la campaña la desviación media es de 34 min en online y 22 min en peak. El 1,9% de las semanas podría cambiar de nivel por ese margen, así que conviene revisar las que quedan al filo de los umbrales.</div></div>
+    </div></div>`;
+
+  h+=`<div class="note d">
+    <strong>Alcance del Fleet Owner.</strong> Global Transport gestiona ocho empresas, pero solo cuatro aportan vehículos vinilados al bonus: 65039, 87971, 93471 y 223891, más 47732 hasta julio. De las otras tres, 66355 es la entidad matriz GLOBAL TRANSPORT ONE MGM S.L. y no tiene coches propios; 202022 (AEROGATE TRAVEL) tiene 10 vehículos cuyo vinilado venció el 16 de junio y sin actividad en el período; y 220826 (AUTOS CARAZO) tiene 19 vehículos que ya no están vinilados, aunque la tabla de períodos conserve registros aprobados sin depurar.
+    <br><strong>2555-LWJ.</strong> La matrícula migró del car_id 5531329 al 11047222 porque el registro se borró y se recreó. Aquí aparecen consolidados, sumando horas y contando GMV una sola vez.
+    <br><strong>6415-KRG.</strong> Tiene inscripción en CarBranding desde el 28 de septiembre de 2026, así que a partir de octubre cobrará por campaña y no debe compensarse por esta vía. Ya está fuera del alcance desde agosto.
+  </div>`;
+  return h;
+}
+
+function render(){
+  COH_DEF=document.getElementById('cf').value;
+  construir();
+  const sel=document.getElementById('mf');
+  const meses=mesesConDatos();
+  if(!sel.options.length){
+    meses.forEach(m=>{
+      const o=document.createElement('option');
+      o.value=String(m);
+      o.textContent=MESL[m-1].charAt(0).toUpperCase()+MESL[m-1].slice(1)+' 2026'
+                    +(m===mesEnCurso()?' · en curso':'');
+      sel.appendChild(o);
+    });
+    const o=document.createElement('option'); o.value='0'; o.textContent='Resumen acumulado';
+    sel.appendChild(o);
+    sel.value=String(mesEnCurso());          // arranca en el mes de la semana viva
+  }
+  const m=parseInt(sel.value);
+  document.getElementById('upd').innerHTML=
+    `<span class="dot"></span>Datos completos hasta el ${fechaL(DATA_HASTA)} · build ${GENERADO}`;
+  const st=document.getElementById('st');
+  if(m===0) st.innerHTML=`<span class="state frz">${meses.filter(x=>(ROSTER[x]||{}).cerrado).length} meses cerrados</span>`;
+  else st.innerHTML=(ROSTER[m]||{}).cerrado
+    ? `<span class="state frz">Cerrado · congelado ${ROSTER[m].at}</span>`
+    : `<span class="state live">Mes en curso</span>`;
+  document.getElementById('main').innerHTML = m===0?summaryView():monthView(m);
+}
+render();
+</script>
+</body>
+</html>
